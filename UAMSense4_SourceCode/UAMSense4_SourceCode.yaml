@@ -1,0 +1,310 @@
+# UAMSense ESPHome source code
+# (C) Carlos Garcia-Saura 2023
+# https://github.com/GNB-UAM/UAMSense
+
+substitutions: # Parameters for each node
+  devicename: "NameOfNode"
+  ipaddress: 172.27.66.X
+  prkey: "WireguardPrivateKeyOfNode"
+
+globals: # Definitions for Bluetooth device counter
+  - id: ids_seen
+    type: void*
+  - id: first_iter
+    type: bool
+    initial_value: true
+
+esphome:
+  name: $devicename
+  includes:
+    - include_set.h
+  on_boot:
+    - priority: 801 # At the start, initialize structure for Bluetooth counter
+      then:
+        - lambda: id(ids_seen) = new std::set<uint64_t>();
+
+esp32: # Select the ESP32 platform
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+wifi: # Define connection parameters
+  use_address: $ipaddress
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+time: # Time source needed for Wireguard synchronization
+  - platform: sntp
+    id: src_time
+
+wireguard: # Configuration of the Wireguard VPN
+  address: $ipaddress
+  private_key: $prkey
+  peer_endpoint: !secret wireguard_server_address
+  peer_public_key: !secret wireguard_server_pubkey
+
+logger: # Enable logging
+
+ota: # Enable remote updating
+  password: !secret ota_password
+
+api: # Enable Home Assistant API
+  services:
+    - service: restart # Remote reboot service
+      then:
+      - lambda: App.reboot();
+
+    - service: play_rtttl # Buzzer driver (melody player)
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
+
+    - service: calibrate_co2_400ppm # CO2 calibration pin service
+      then:
+      - switch.turn_on: CO2calibration_PIN
+      - delay: 5s
+      - switch.turn_off: CO2calibration_PIN
+
+# Buzzer driver (melody player)
+rtttl:
+  output: rtttl_out
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+
+esp32_ble_tracker:
+  scan_parameters:
+    active: false # We don't need additional device data, just the MAC and RSSI
+  on_ble_advertise:
+    then: # Annotate the source MAC of each bluetooth announcement packet
+      - lambda: |-
+          auto ids_seen_set = (std::set<uint64_t>*)id(ids_seen);
+          if(x.get_rssi() >= -75) // Threshold to register only nearby packets
+            ids_seen_set->insert(x.address_uint64()); // Auto-ignores duplicates
+
+i2c:
+  sda: 19
+  scl: 18
+  frequency: 150kHz # Increase from the default 50kHz; the si1132 needs >95kHz
+  scan: false
+
+sensor:
+  - platform: si1132 # Ambient light sensor
+    update_interval: 1s
+    luminosity:
+      name: ${devicename} Visible light
+      unit_of_measurement: lx
+      device_class: illuminance
+      icon: mdi:lightbulb-cfl
+      accuracy_decimals: 2
+      filters:
+        - filter_out: NaN
+        - median
+        - throttle_average: 60s
+    infrared:
+      name: ${devicename} Visible+IR light
+      unit_of_measurement: lx
+      device_class: illuminance
+      icon: mdi:lightbulb
+      accuracy_decimals: 2
+      filters:
+        - filter_out: NaN
+        - median
+        - throttle_average: 60s
+
+  - platform: template # Bluetooth device counter
+    name: ${devicename} Nearby BT devices
+    icon: mdi:devices
+    update_interval: 60s
+    unit_of_measurement: devices
+    accuracy_decimals: 0
+    lambda: !lambda |-
+       auto idset = (std::set<uint64_t>*)id(ids_seen);
+       auto count = idset->size(); // The set size is the unique MAC count
+       idset->clear(); // Reset the device list for the next counting period
+       if(id(first_iter)) { // Prevent sending n=0 at every reboot
+           id(first_iter) = false;
+           return {};
+       }
+       return count;
+
+  - platform: duty_cycle # CO2 sensor CDM7160
+    pin: GPIO21
+    update_interval: 60s
+    name: ${devicename} CO2 level
+    icon: mdi:molecule-co2
+    unit_of_measurement: 'ppm'
+    device_class: carbon_dioxide
+    accuracy_decimals: 0 # Round ppm to integer when sending to Home Assistant
+    filters:
+      - multiply: 50 # convert PWM duty cycle (0-100) to CO2 ppm (0-5000)
+
+  - platform: bme280 # Tempeature/Humidity/Pressure sensor
+    address: 0x76 # 0x76 measures outside, 0x77 is located near peltier
+    update_interval: 2s
+    temperature:
+      name: ${devicename} Temperature
+      accuracy_decimals: 2
+      filters:
+        - filter_out: NaN
+        - median
+        - throttle_average: 60s
+    pressure:
+      name: ${devicename} Pressure
+      accuracy_decimals: 2
+      filters:
+        - filter_out: NaN
+        - median
+        - throttle_average: 60s
+    humidity:
+      name: ${devicename} Humidity
+      accuracy_decimals: 2
+      filters:
+        - filter_out: NaN
+        - median
+        - throttle_average: 60s
+
+  - platform: adc # Figaro olfactory sensor. Repeats for all the TGS sensors
+    pin: GPIO36
+    name: ${devicename} TGS2602 #TGS1
+    icon: mdi:molecule
+    attenuation: auto # New auto-range feature implemented by us (PR#2541)
+    accuracy_decimals: 5
+    update_interval: 2s
+    filters:
+      - throttle_average: 60s
+    
+  - platform: adc
+    pin: GPIO39
+    name: ${devicename} TGS2603 #TGS2
+    icon: mdi:molecule
+    attenuation: auto
+    accuracy_decimals: 5
+    update_interval: 2s
+    filters:
+      - throttle_average: 60s
+    
+  - platform: adc
+    pin: GPIO34
+    name: ${devicename} TGS2611 #TGS3
+    icon: mdi:molecule
+    attenuation: auto
+    accuracy_decimals: 5
+    update_interval: 2s
+    filters:
+      - throttle_average: 60s
+    
+  - platform: adc
+    pin: GPIO35
+    name: ${devicename} TGS2620 #TGS4
+    icon: mdi:molecule
+    attenuation: auto
+    accuracy_decimals: 5
+    update_interval: 2s
+    filters:
+      - throttle_average: 60s
+    
+  - platform: adc
+    pin: GPIO32
+    name: ${devicename} TGS2600 #TGS5
+    icon: mdi:molecule
+    attenuation: auto
+    accuracy_decimals: 5
+    update_interval: 2s
+    filters:
+      - throttle_average: 60s
+    
+  #- platform: adc # Additional TGS sensor
+  #  pin: GPIO25 # GPIO25 BELONGS TO ADC2, WHICH IS NOT AVAILABLE WHEN USING WIFI/BT
+  #  name: ${devicename} TGS2610 #TGS6
+  
+  #- platform: adc # Battery voltage
+  #  pin: GPIO26 # GPIO26 BELONGS TO ADC2, WHICH IS NOT AVAILABLE WHEN USING WIFI/BT
+  #  name: "Battery voltage"
+
+  - platform: adc # "Grove" Loudness sensor
+    pin: GPIO33
+    name: ${devicename} Loudness
+    icon: mdi:waveform
+    unit_of_measurement: 'au'
+    attenuation: auto # New auto-range feature implemented by us (PR#2541)
+    update_interval: 150ms
+    accuracy_decimals: 5
+    filters:
+      - throttle_average: 60s
+      - offset: -0.075 # The ADC in this ESP32 cannot read values below 0.075V, make them 0V to increase SNR
+
+#  - platform: mpu6050 # Accel/Gyro sensor driver (example)
+#    address: 0x68
+#    accel_x:
+#      name: "MPU6050 Accel X"
+#    accel_y:
+#      name: "MPU6050 Accel Y"
+#    accel_z:
+#      name: "MPU6050 Accel Z"
+#    gyro_x:
+#      name: "MPU6050 Gyro X"
+#    gyro_y:
+#      name: "MPU6050 Gyro Y"
+#    gyro_z:
+#      name: "MPU6050 Gyro Z"
+#    temperature:
+#      name: "MPU6050 Temperature"
+
+  - platform: wifi_signal # Wifi RSSI signal
+    name: ${devicename} WiFi RSSI
+    update_interval: 2s
+    accuracy_decimals: 1
+    filters:
+      - throttle_average: 60s
+
+  - platform: duty_cycle # DSM501 dust sensor
+    pin:
+      number: GPIO23
+      inverted: True
+    name: ${devicename} Particles >2.5um #PM25
+    icon: mdi:circle-medium
+    unit_of_measurement: 'dc'
+    accuracy_decimals: 5
+    update_interval: 300s
+  - platform: duty_cycle
+    pin:
+      number: GPIO22
+      inverted: True
+    name: ${devicename} Particles >1um #PM10
+    icon: mdi:circle-small
+    unit_of_measurement: 'dc'
+    accuracy_decimals: 5
+    update_interval: 300s
+ 
+
+binary_sensor:
+  - platform: gpio # Reed-based door sensor
+    pin: GPIO14
+    name: ${devicename} Door
+    device_class: door
+
+output:
+  # Peltier driver (heater/cooler)
+  - platform: gpio
+    pin: GPIO4
+    id: Hpwm_PIN
+  - platform: gpio
+    pin: GPIO16
+    id: HinB_PIN
+  - platform: gpio
+    pin: GPIO17
+    id: HinA_PIN
+
+  # Buzzer driver (melody player)
+  - platform: ledc
+    pin: GPIO12
+    id: rtttl_out
+
+switch:
+  - platform: gpio # Calibration pin for CO2 sensor
+    pin:
+      number: GPIO27
+      inverted: true
+    id: CO2calibration_PIN

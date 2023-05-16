@@ -1,0 +1,231 @@
+PCBNEW-LibModule-V1  
+# encoding utf-8
+Units mm
+$INDEX
+SSOP16
+$EndINDEX
+$MODULE SSOP16
+Po 0 0 0 15 00000000 00000000 ~~
+Li SSOP16
+Cd <b>Small Shrink Outline Package</b>
+Sc 00000000
+At SMD
+Op 0 0 0
+.SolderMask 0.1
+.SolderPaste 0
+T0 -3.571 -0.336 1 1 900 0.05 N V 21 "SSOP16"
+T1 3.459 -0.859 1 1 900 0.05 N V 21 "VAL**"
+DS -2.568 -2.145 2.568 -2.145 0.2032 21
+DS 2.568 -2.145 2.568 2.145 0.2032 21
+DS 2.568 2.145 -2.568 2.145 0.2032 21
+DS -2.568 2.145 -2.568 -2.145 0.2032 21
+DC -1.885 1.495 -1.495 1.495 0.2032 21
+DP 0 0 0 0 4 0.381 24
+Dl -2.4375 2.2425
+Dl -2.1125 2.2425
+Dl -2.1125 3.315
+Dl -2.4375 3.315
+DP 0 0 0 0 4 0.381 24
+Dl -1.7875 2.2425
+Dl -1.4625 2.2425
+Dl -1.4625 3.315
+Dl -1.7875 3.315
+DP 0 0 0 0 4 0.381 24
+Dl -1.1375 2.2425
+Dl -0.8125 2.2425
+Dl -0.8125 3.315
+Dl -1.1375 3.315
+DP 0 0 0 0 4 0.381 24
+Dl -0.4875 2.2425
+Dl -0.1625 2.2425
+Dl -0.1625 3.315
+Dl -0.4875 3.315
+DP 0 0 0 0 4 0.381 24
+Dl 0.1625 2.2425
+Dl 0.4875 2.2425
+Dl 0.4875 3.315
+Dl 0.1625 3.315
+DP 0 0 0 0 4 0.381 24
+Dl 0.8125 2.2425
+Dl 1.1375 2.2425
+Dl 1.1375 3.315
+Dl 0.8125 3.315
+DP 0 0 0 0 4 0.381 24
+Dl 1.4625 2.2425
+Dl 1.7875 2.2425
+Dl 1.7875 3.315
+Dl 1.4625 3.315
+DP 0 0 0 0 4 0.381 24
+Dl 2.1125 2.2425
+Dl 2.4375 2.2425
+Dl 2.4375 3.315
+Dl 2.1125 3.315
+DP 0 0 0 0 4 0.381 24
+Dl 2.1125 -3.315
+Dl 2.4375 -3.315
+Dl 2.4375 -2.2425
+Dl 2.1125 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl 1.4625 -3.315
+Dl 1.7875 -3.315
+Dl 1.7875 -2.2425
+Dl 1.4625 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl 0.8125 -3.315
+Dl 1.1375 -3.315
+Dl 1.1375 -2.2425
+Dl 0.8125 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl 0.1625 -3.315
+Dl 0.4875 -3.315
+Dl 0.4875 -2.2425
+Dl 0.1625 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl -0.4875 -3.315
+Dl -0.1625 -3.315
+Dl -0.1625 -2.2425
+Dl -0.4875 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl -1.1375 -3.315
+Dl -0.8125 -3.315
+Dl -0.8125 -2.2425
+Dl -1.1375 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl -1.7875 -3.315
+Dl -1.4625 -3.315
+Dl -1.4625 -2.2425
+Dl -1.7875 -2.2425
+DP 0 0 0 0 4 0.381 24
+Dl -2.4375 -3.315
+Dl -2.1125 -3.315
+Dl -2.1125 -2.2425
+Dl -2.4375 -2.2425
+$PAD
+Sh "1" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -2.275 2.925
+$EndPAD
+$PAD
+Sh "2" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -1.625 2.925
+$EndPAD
+$PAD
+Sh "3" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -0.975 2.925
+$EndPAD
+$PAD
+Sh "4" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -0.325 2.925
+$EndPAD
+$PAD
+Sh "5" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 0.325 2.925
+$EndPAD
+$PAD
+Sh "6" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 0.975 2.925
+$EndPAD
+$PAD
+Sh "7" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 1.625 2.925
+$EndPAD
+$PAD
+Sh "8" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 2.275 2.925
+$EndPAD
+$PAD
+Sh "9" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 2.275 -2.925
+$EndPAD
+$PAD
+Sh "10" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 1.625 -2.925
+$EndPAD
+$PAD
+Sh "11" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 0.975 -2.925
+$EndPAD
+$PAD
+Sh "12" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po 0.325 -2.925
+$EndPAD
+$PAD
+Sh "13" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -0.325 -2.925
+$EndPAD
+$PAD
+Sh "14" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -0.975 -2.925
+$EndPAD
+$PAD
+Sh "15" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -1.625 -2.925
+$EndPAD
+$PAD
+Sh "16" R 0.4 1.2 0 0 0
+At SMD N 00888000
+.SolderMask 0.2
+.SolderPaste 0
+Ne 0 ""
+Po -2.275 -2.925
+$EndPAD
+$EndMODULE SSOP16
