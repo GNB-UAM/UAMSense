@@ -5,7 +5,12 @@ ___These are experimental designs. Use at your own risk.___
 
 Citation:
 ```
-Exploration and characterization of environments under uncertainty using multimodal sensors, Carlos Garcia-Saura, 2023.
+@phdthesis{garciasaura2023,
+  title={Exploration and characterization of environments under uncertainty using multimodal sensors},
+  author={Garcia-Saura, Carlos},
+  year={2023,
+  school={PhD thesis, Escuela Politecnica Superior, Universidad Autonoma de Madrid}
+}
 ```
 
 UAMSense 4
